@@ -1,0 +1,4 @@
+name = Boolean formatters
+description = Provides additional formatters for boolean list field types.
+core = 7.x
+dependencies[] = list
