@@ -138,7 +138,7 @@ function boolean_formatter_field_formatter_view($entity_type, $entity, $field, $
       foreach ($items as $delta => $item) {
         $value = !empty($values[1]) ? $item['value'] == $values[1] : !empty($item['value']);
         $text = boolean_formatter_display_value_with_format($value, $settings['format'], $settings);
-        $element[$delta] = array('#markup' => $text);
+        $element[$delta] = array('#markup' => field_filter_xss($text));
       }
       break;
   }
