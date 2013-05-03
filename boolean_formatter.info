@@ -1,4 +1,4 @@
-name = Boolean formatters
-description = Provides additional formatters for boolean list field types.
+name = Boolean formatter
+description = Provides a Views-style formatter for boolean list fields.
 core = 7.x
 dependencies[] = list
