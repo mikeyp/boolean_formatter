@@ -118,7 +118,7 @@ function boolean_formatter_field_formatter_settings_summary($field, $instance, $
     case 'boolean_yes_no':
       $formats = boolean_formatter_display_format_options();
       $summary[] = t('Output format: %format', array('%format' => $formats[$settings['format']]));
-      $summary[] = t('Reversed: @reversed', array('@reversed' => boolean_formatter_display_value_with_format($settings['reverse'], 'yes-no', FALSE)));
+      $summary[] = t('Reversed: @reversed', array('@reversed' => boolean_formatter_display_value_with_format($settings['reverse'], 'yes-no', array('reverse' => FALSE))));
       break;
   }
 
