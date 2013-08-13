@@ -34,7 +34,7 @@ function boolean_formatter_display_value_with_format($value, $format, array $opt
   if (!empty($options['reverse'])) {
     $value = !(bool) $value;
   }
-  return !empty($value) ? $formats[$format][1] : $formats[$format][0];
+  return !empty($value) ? $formats[$format][0] : $formats[$format][1];
 }
 
 /**
