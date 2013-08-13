@@ -16,12 +16,12 @@ function boolean_formatter_display_formats(array $options = array()) {
   return $formats;
 }
 
-function boolean_formatter_display_format_options() {
-  $options = array();
-  foreach (boolean_formatter_display_formats() as $key => $format) {
-    $options[$key] = implode('/', $format);
+function boolean_formatter_display_format_options(array $options = array()) {
+  $format_options = array();
+  foreach (boolean_formatter_display_formats($options) as $key => $format) {
+    $format_options[$key] = implode('/', $format);
   }
-  return $options;
+  return $format_options;
 }
 
 function boolean_formatter_display_value_with_format($value, $format, array $options = array()) {
@@ -34,6 +34,7 @@ function boolean_formatter_display_value_with_format($value, $format, array $opt
   if (!empty($options['reverse'])) {
     $value = !(bool) $value;
   }
+  // The first format value is the 'On' value, the second is the 'Off' format.
   return !empty($value) ? $formats[$format][0] : $formats[$format][1];
 }
 
@@ -65,11 +66,11 @@ function boolean_formatter_field_formatter_settings_form($field, $instance, $vie
 
   switch ($display['type']) {
     case 'boolean_yes_no':
-      $element['type'] = array(
+      $element['format'] = array(
         '#type' => 'select',
         '#title' => t('Output format'),
         '#options' => boolean_formatter_display_format_options(),
-        '#default_value' => $settings['type'],
+        '#default_value' => $settings['format'],
       );
 
       $element['custom_on'] = array(
@@ -79,7 +80,7 @@ function boolean_formatter_field_formatter_settings_form($field, $instance, $vie
         '#states' => array(
           'visible' => array(
             // , select[name="options[settings][type]"]
-            'select[name="fields[' . $field['field_name'] . '][settings_edit_form][settings][type]"]' => array('value' => 'custom'),
+            'select[name="fields[' . $field['field_name'] . '][settings_edit_form][settings][format]"]' => array('value' => 'custom'),
           ),
         ),
       );
@@ -90,7 +91,7 @@ function boolean_formatter_field_formatter_settings_form($field, $instance, $vie
         '#default_value' => $settings['custom_off'],
         '#states' => array(
           'visible' => array(
-            'select[name="fields[' . $field['field_name'] . '][settings_edit_form][settings][type]"]' => array('value' => 'custom'),
+            'select[name="fields[' . $field['field_name'] . '][settings_edit_form][settings][format]"]' => array('value' => 'custom'),
           ),
         ),
       );
@@ -116,7 +117,7 @@ function boolean_formatter_field_formatter_settings_summary($field, $instance, $
 
   switch ($display['type']) {
     case 'boolean_yes_no':
-      $formats = boolean_formatter_display_format_options();
+      $formats = boolean_formatter_display_format_options($settings);
       $summary[] = t('Output format: %format', array('%format' => $formats[$settings['format']]));
       $summary[] = t('Reversed: @reversed', array('@reversed' => boolean_formatter_display_value_with_format($settings['reverse'], 'yes-no', array('reverse' => FALSE))));
       break;
