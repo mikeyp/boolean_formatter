@@ -41,7 +41,7 @@ class BooleanYesNo extends FormatterBase {
     $form['format'] = array(
       '#type' => 'select',
       '#title' => t('Output format'),
-      '#options' => boolean_formatter_display_format_options(),
+      '#options' => $this->getFormatOptions(),
       '#default_value' => $this->getSetting('format'),
     );
     $form['custom_on'] = array(
@@ -78,9 +78,9 @@ class BooleanYesNo extends FormatterBase {
    * {@inheritdoc}
    */
   public function settingsSummary() {
-    $formats = boolean_formatter_display_format_options($this->settings);
+    $formats = $this->getFormatOptions($this->settings);
     $summary[] = t('Output format: %format', array('%format' => $formats[$this->getSetting('format')]));
-    $summary[] = t('Reversed: @reversed', array('@reversed' => boolean_formatter_display_value_with_format($this->getSetting('reverse'), 'yes-no', array('reverse' => FALSE))));
+    $summary[] = t('Reversed: @reversed', array('@reversed' => $this->displayValueWithFormat($this->getSetting('reverse'), 'yes-no', array('reverse' => FALSE))));
     return $summary;
   }
 
@@ -93,10 +93,48 @@ class BooleanYesNo extends FormatterBase {
     $values = options_allowed_values($this->fieldDefinition, $entity);
     foreach ($items as $delta => $item) {
       $value = !empty($values[1]) ? $item->value == $values[1] : !empty($item->value);
-      $text = boolean_formatter_display_value_with_format($value, $this->getSetting('format'), $this->settings);
+      $text = $this->displayValueWithFormat($value, $this->getSetting('format'), $this->settings);
       $elements[$delta] = array('#markup' => field_filter_xss($text));
     }
 
     return $elements;
+  }
+
+  public function getFormats(array $options = array()) {
+    $formats = array(
+      'yes-no' => array(t('Yes'), t('No')),
+      'true-false' => array(t('True'), t('False')),
+      'on-off' => array(t('On'), t('Off')),
+      'enabled-disabled' => array(t('Enabled'), t('Disabled')),
+      'boolean' => array(1, 0),
+      'unicode-yes-no' => array('✔', '✖'),
+      'custom' => array(t('Custom')),
+    );
+    if (isset($options['custom_on']) && isset($options['custom_off'])) {
+      $formats['custom'] = array($options['custom_on'], $options['custom_off']);
+    }
+    return $formats;
+  }
+
+  public function getFormatOptions(array $options = array()) {
+    $format_options = array();
+    foreach ($this->getFormats($options) as $key => $format) {
+      $format_options[$key] = implode('/', $format);
+    }
+    return $format_options;
+  }
+
+  public function displayValueWithFormat($value, $format, array $options = array()) {
+    $formats = $this->getFormats($options);
+    if (!isset($formats[$format])) {
+      // If format is invalid, default to the first available format.
+      reset($formats);
+      $format = key($formats);
+    }
+    if (!empty($options['reverse'])) {
+      $value = !(bool) $value;
+    }
+    // The first format value is the 'On' value, the second is the 'Off' format.
+    return !empty($value) ? $formats[$format][0] : $formats[$format][1];
   }
 }
